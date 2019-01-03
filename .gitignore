@@ -1,0 +1,10 @@
+/apache-maven-*/
+/BuildData/
+/BuildTools.jar
+/BuildTools.log.txt
+/Bukkit/
+/CraftBukkit/
+/Dockerfile
+/rootfs/
+/Spigot/
+/work/
