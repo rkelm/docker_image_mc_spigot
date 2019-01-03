@@ -86,7 +86,7 @@ sed "1 s/SED_REPLACE_TAG_APP_VERSION/${APP_VERSION}/" "${project_dir}/Dockerfile
 
 # Build.
 echo "Building $local_repo_tag"
-RCONPWD="${RCONPWD}" APP_VERSION="${APP_VERSION}" docker build "${project_dir}" -t "${local_repo_tag}"
+RCONPWD="${rconpwd}" APP_VERSION="${APP_VERSION}" docker build "${project_dir}" -t "${local_repo_tag}"
 errchk $? 'Docker build failed.'
 
 # Get image id.

@@ -1,12 +1,12 @@
 FROM rkelm/vanilla_minecraft:SED_REPLACE_TAG_APP_VERSION
 
-# Delete old jar file.
-RUN rm ${APP_DIR}/${JAR_FILE}
-
-ENV APP_VERSION 1.11.2
+ENV APP_VERSION 1.13.2
 ENV APP_NAME Spigot Minecraft
 ENV JAR_FILE spigot-${APP_VERSION}.jar
 
+# Delete old jar file.
+ENV VANILLA_JAR_FILE minecraft_server.${APP_VERSION}.jar
+RUN rm ${APP_DIR}/${VANILLA_JAR_FILE}
 
 ADD rootfs /
 
