@@ -1,0 +1,9 @@
+apache*
+BuildData/
+BuildTools.jar
+*.txt
+Bukkit/
+Craftbukkit/
+Dockerfile.master
+Spigot/
+work/
