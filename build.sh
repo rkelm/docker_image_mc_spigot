@@ -50,11 +50,11 @@ else
 fi
 
 build_tools_jar="${project_dir}/BuildTools.jar"
-spigot_jar="${project_dir}/spigot-${APP_VERSION}.jar"
-craftbukkit_jar="${project_dir}/craftbukkit-${APP_VERSION}.jar"
+spigot_jar="${project_dir}/spigot-${app_version}.jar"
+craftbukkit_jar="${project_dir}/craftbukkit-${app_version}.jar"
 
 # Prepare rootfs.
-jar_file=minecraft_server.${APP_VERSION}.jar
+jar_file=minecraft_server.${app_version}.jar
 rootfs="${project_dir}/rootfs"
 
 echo "Cleaning up rootfs from previous build."
@@ -75,7 +75,7 @@ if [ ! -e "${spigot_jar}" ] ; then
     # Prepare git.
     git config --global --unset core.autocrlf
     # Compile spigot.
-    java -jar BuildTools.jar -rev "${APP_VERSION}"
+    java -jar BuildTools.jar -rev "${app_version}"
     chmod +x "${spigot_jar}"
 fi
 
@@ -83,7 +83,7 @@ cp "${spigot_jar}" "${rootfs}/opt/mc/server/"
 
 # Rewrite base image tag in Dockerfile. (ARG Variables support in FROM starting in docker v17.)
 echo '# This file is automatically created from Dockerfile.master. DO NOT EDIT! EDIT Dockerfile.master!' > "${project_dir}/Dockerfile"
-sed "s/SED_REPLACE_TAG_APP_VERSION/${APP_VERSION}/g" "${project_dir}/Dockerfile.master" >> "${project_dir}/Dockerfile"
+sed "s/SED_REPLACE_TAG_APP_VERSION/${app_version}/g" "${project_dir}/Dockerfile.master" >> "${project_dir}/Dockerfile"
 
 # Build.
 echo "Building $local_repo_tag"
