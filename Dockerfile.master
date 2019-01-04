@@ -1,16 +1,14 @@
 FROM rkelm/vanilla_minecraft:SED_REPLACE_TAG_APP_VERSION
 
-ENV APP_VERSION 1.13.2
+ENV APP_VERSION SED_REPLACE_TAG_APP_VERSION
 ENV APP_NAME Spigot Minecraft
-ENV JAR_FILE spigot-${APP_VERSION}.jar
+ENV JAR_FILE spigot-SED_REPLACE_TAG_APP_VERSION.jar
+ENV JAR_FILE_VANILLA minecraft_server.SED_REPLACE_TAG_APP_VERSION.jar
 
 # Delete old jar file.
-ENV VANILLA_JAR_FILE minecraft_server.${APP_VERSION}.jar
-RUN rm ${APP_DIR}/${VANILLA_JAR_FILE}
+RUN rm ${APP_DIR}/${JAR_FILE_VANILLA}
 
 ADD rootfs /
-
-
 
 RUN echo -e ' ************************************************** \n' \
   "Docker Image to run app ${APP_NAME} ${APP_VERSION}. \n" \

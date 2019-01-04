@@ -3,7 +3,7 @@
 if [ -z $1 ] ; then
     echo "usage: $(basename $0) <mc_version>"
     echo "requirements"
-    echo "    openjdk-11-jdk-headless"
+    echo "    openjdk-8-jre-headless"
     echo "    git"
     exit 1
 fi
@@ -29,8 +29,8 @@ if [ -z "$rconpwd" ] || [ -z "$local_repo_path" ] || [ -z "$remote_repo_path" ] 
     errchk 1 'Configuration variables in script not set. Assign values in script or set corresponding environment variables.'
 fi
 
-APP_VERSION=$1
-image_tag=$APP_VERSION
+app_version=$1
+image_tag=$app_version
 
 # project_dir="$(echo ~ubuntu)/docker_work/spigot_mc"
 # The project directory is the folder containing this script.
@@ -66,9 +66,10 @@ mkdir -p ${rootfs}/opt/mc/server/world_nether
 #mkdir -p ${rootfs}/opt/mc/bin
 
 # Download BuildTools.
-if [ ! -e "${build_tools_jar}"  ] ; then
-    curl -o "${build_tools_jar}" "https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar"
-fi
+#if [ ! -e "${build_tools_jar}"  ] ; then
+# Always download fresh BuildTools.jar.
+curl -o "${build_tools_jar}" "https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar"
+#fi
 
 if [ ! -e "${spigot_jar}" ] ; then
     # Prepare git.
@@ -82,11 +83,11 @@ cp "${spigot_jar}" "${rootfs}/opt/mc/server/"
 
 # Rewrite base image tag in Dockerfile. (ARG Variables support in FROM starting in docker v17.)
 echo '# This file is automatically created from Dockerfile.master. DO NOT EDIT! EDIT Dockerfile.master!' > "${project_dir}/Dockerfile"
-sed "1 s/SED_REPLACE_TAG_APP_VERSION/${APP_VERSION}/" "${project_dir}/Dockerfile.master" >> "${project_dir}/Dockerfile"
+sed "s/SED_REPLACE_TAG_APP_VERSION/${APP_VERSION}/g" "${project_dir}/Dockerfile.master" >> "${project_dir}/Dockerfile"
 
 # Build.
 echo "Building $local_repo_tag"
-RCONPWD="${rconpwd}" APP_VERSION="${APP_VERSION}" docker build "${project_dir}" -t "${local_repo_tag}"
+RCONPWD="${rconpwd}" APP_VERSION="${app_version}" docker build "${project_dir}" -t "${local_repo_tag}"
 errchk $? 'Docker build failed.'
 
 # Get image id.
