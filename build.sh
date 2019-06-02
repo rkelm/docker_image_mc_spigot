@@ -67,7 +67,9 @@ mkdir -p ${rootfs}/opt/mc/jar
 mkdir -p ${rootfs}/opt/mc/bin
 
 cp prepare_java_app.sh ${rootfs}/opt/mc/bin
+chmod ug+x "${rootfs}/opt/mc/bin/prepare_java_app.sh"
 cp unprepare_java_app.sh ${rootfs}/opt/mc/bin
+chmod ug+x "${rootfs}/opt/mc/bin/unprepare_java_app.sh"
 
 # Download BuildTools.
 #if [ ! -e "${build_tools_jar}"  ] ; then
