@@ -6,7 +6,7 @@ echo Script retuns non-zero value if not successful.
 img_name='rkelm/spigot_minecraft_2:1.13.2'
 img_run_cmd='/opt/mc/bin/run_java_app.sh'
 container_name="TEST-SIMPLE-RUN"
-test_log_file="test-simple-run.log"
+test_log_file="test_simple_run.log"
 test_log_string_success="INFO]: Preparing spawn area: "
 
 
