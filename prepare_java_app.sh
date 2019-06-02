@@ -1,4 +1,4 @@
-#!/bin/ash
+#!/bin/bash
 # Create links for all plugins in server directory.
 for filename in "${APP_DIR}/plugins/*.jar" ; do
     test -e "$filename" || continue 
