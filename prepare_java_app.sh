@@ -1,6 +1,9 @@
 #!/bin/bash
 # Create links for all plugins in server directory.
-for filename in "${APP_DIR}/plugins/*.jar" ; do
-    test -e "$filename" || continue 
-    ln -f -s "${filename}" "${SERVER_DIR}/plugins/$(basename $filename)"
+mkdir -p "${SERVER_DIR}/plugins"
+for filename in ${PLUGINS_JAR_DIR}/*.jar ; do
+    echo prepare_java_app: $filename
+    test -e "$filename" || continue
+    echo prepare_java_app: linking plugin jar $filename to ${SERVER_DIR}/plugins/$(basename $filename)
+    ln -s "${filename}" "${SERVER_DIR}/plugins/$(basename $filename)"
 done
