@@ -2,13 +2,17 @@ FROM rkelm/vanilla_minecraft_2:SED_REPLACE_TAG_APP_VERSION
 
 ARG APP_VERSION
 
-ENV APP_VERSION SED_REPLACE_TAG_APP_VERSION
+#ENV APP_VERSION SED_REPLACE_TAG_APP_VERSION
+ENV APP_VERSION $APP_VERSION
 ENV APP_NAME Spigot Minecraft
 ENV JAR_FILE spigot-SED_REPLACE_TAG_APP_VERSION.jar
 ENV JAR_FILE_VANILLA minecraft_server.SED_REPLACE_TAG_APP_VERSION.jar
+ENV PLUGINS_JAR_DIR $INSTALL_DIR/plugins_jar
 
 # Delete old jar file.
 RUN rm ${APP_DIR}/${JAR_FILE_VANILLA}
+# Create Directory for plugin jar files.
+RUN mkdir -p ${PLUGINS_JAR_DIR}
 
 ADD rootfs /
 
@@ -26,10 +30,8 @@ RUN echo -e ' ************************************************** \n' \
   "                  Every app command and its parameters must be single or double quoted. \n" \
 '**************************************************' > /image_info.txt
 
-VOLUME ["${APP_DIR}/world_the_end", "${APP_DIR}/world_nether", "${APP_DIR}/world", "${APP_DIR}/logs"]
+VOLUME ["${SERVER_DIR}", "${SERVER_DIR}/logs"]
 
 EXPOSE 25565 25575
 
 CMD ["/bin/cat", "/image_info.txt"]
-
-

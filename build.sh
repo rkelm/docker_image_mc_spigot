@@ -61,10 +61,12 @@ echo "Cleaning up rootfs from previous build."
 rm -frd "$rootfs"
 
 mkdir -p ${rootfs}/opt/mc/server
+mkdir -p ${rootfs}/opt/mc/server/world
 mkdir -p ${rootfs}/opt/mc/server/world_the_end
 mkdir -p ${rootfs}/opt/mc/server/world_nether
 mkdir -p ${rootfs}/opt/mc/jar
 mkdir -p ${rootfs}/opt/mc/bin
+mkdir -p ${rootfs}/opt/mc/plugins_jar
 
 cp prepare_java_app.sh ${rootfs}/opt/mc/bin
 chmod ug+x "${rootfs}/opt/mc/bin/prepare_java_app.sh"
