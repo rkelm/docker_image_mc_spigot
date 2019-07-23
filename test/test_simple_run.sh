@@ -3,7 +3,13 @@ echo Simple test run of docker image.
 echo Test is successful if image runs and outputs 'Preparing spawn area:' with in 5 minutes.
 echo Script retuns non-zero value if not successful.
 
-img_name='rkelm/spigot_minecraft_2:1.13.2'
+
+if [ -z "$1" ] ; then
+    echo "usage: test_simple_run.sh <name of image>"
+    exit 1
+fi
+
+img_name="$1"
 img_run_cmd='/opt/mc/bin/run_java_app.sh'
 container_name="TEST-SIMPLE-RUN"
 test_log_file="test_simple_run.log"
