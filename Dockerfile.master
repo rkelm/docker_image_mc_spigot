@@ -1,4 +1,4 @@
-FROM rkelm/vanilla_minecraft_2:SED_REPLACE_TAG_APP_VERSION
+FROM rkelm/vanilla_minecraft_jdk8_2:SED_REPLACE_TAG_APP_VERSION
 
 ARG APP_VERSION
 

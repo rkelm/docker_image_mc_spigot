@@ -21,7 +21,7 @@ errchk() {
 rconpwd="$BAKERY_RCONPWD"
 local_repo_path="$BAKERY_LOCAL_REPO_PATH"
 remote_repo_path="$BAKERY_REMOTE_REPO_PATH"
-repo_name="spigot_minecraft_2"
+repo_name="spigot_minecraft_jdk8_2"
 
 # Some options may be edited directly in the Dockerfile.master.
 
