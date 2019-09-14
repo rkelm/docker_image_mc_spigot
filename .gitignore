@@ -1,6 +1,7 @@
 /apache-maven-*/
 /BuildData/
 /BuildTools.jar
+/BuildTools.jar.1
 /BuildTools.log.txt
 /Bukkit/
 /CraftBukkit/
@@ -10,3 +11,4 @@
 /work/
 /*.jar
 *~
+/test/*.log
