@@ -8,6 +8,16 @@ if [ -z $1 ] ; then
     exit 1
 fi
 
+# ***** Configuration *****
+# Assign configuration values here or set environment variables before calling script.
+rconpwd="$BAKERY_RCONPWD"
+local_repo_path="$BAKERY_LOCAL_REPO_PATH"
+remote_repo_path="$BAKERY_REMOTE_REPO_PATH"
+repo_name="minecraft_spigot"
+
+# Some options may be edited directly in the Dockerfile.master.
+
+# ***** Functions *****
 errchk() {
     if [ "$1" != "0" ] ; then
 	echo "$2"
@@ -15,21 +25,6 @@ errchk() {
 	exit 1
     fi
 }
-
-# ***** Configuration *****
-# Assign configuration values here or set environment variables before calling script.
-rconpwd="$BAKERY_RCONPWD"
-local_repo_path="$BAKERY_LOCAL_REPO_PATH"
-remote_repo_path="$BAKERY_REMOTE_REPO_PATH"
-repo_name="spigot_minecraft_jdk8_2"
-
-# Some options may be edited directly in the Dockerfile.master.
-
-if [ -z "$rconpwd" ] || [ -z "$local_repo_path" ] || [ -z "$remote_repo_path" ] ; then
-    errchk 1 'Configuration variables in script not set. Assign values in script or set corresponding environment variables.'
-fi
-
-# ***** Functions *****
 
 ver_cmp() {
     local IFS=.
@@ -47,6 +42,9 @@ ver_ge() {
 
 
 # ***** Initialize *****
+if [ -z "$rconpwd" ] || [ -z "$local_repo_path" ] || [ -z "$remote_repo_path" ] ; then
+    errchk 1 'Configuration variables in script not set. Assign values in script or set corresponding environment variables.'
+fi
 
 app_version=$1
 image_tag=$app_version
@@ -93,18 +91,17 @@ cp unprepare_java_app.sh ${rootfs}/opt/mc/bin
 chmod ug+x "${rootfs}/opt/mc/bin/unprepare_java_app.sh"
 
 # Download BuildTools.
-#if [ ! -e "${build_tools_jar}"  ] ; then
-# Always download fresh BuildTools.jar.
-
-#fi
-
 if [ ! -e "${spigot_jar}" ] ; then
     curl -o "${build_tools_jar}" "https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar"
+    errchk $? "Download of spigot BuildTools.jar failed."
     # Prepare git.
     git config --global --unset core.autocrlf
     # Compile spigot.
     java -jar BuildTools.jar -rev "${app_version}"
+    errchk $? "Build of spigot jar file ${spigot_jar} failed."
     chmod +x "${spigot_jar}"
+else
+    echo "Skipping build of ${spigot_jar} and using existing version. To force rebuild, delete ${spigot_jar}."
 fi
 
 cp "${spigot_jar}" "${rootfs}/opt/mc/jar/"
@@ -115,7 +112,7 @@ cp "${spigot_jar}" "${rootfs}/opt/mc/jar/"
 
 # Build.
 echo "Building $local_repo_tag"
-docker build "${project_dir}" --no-cache --build-arg RCONPWD="${rconpwd}" --build-arg APP_VERSION="${app_version}" -t "${local_repo_tag}" -f Dockerfile.master
+docker build "${project_dir}" --no-cache --build-arg APP_VERSION="${app_version}" -t "${local_repo_tag}" -f Dockerfile
 
 errchk $? 'Docker build failed.'
 
@@ -126,12 +123,30 @@ test -n $image_id
 errchk $? 'Could not retrieve docker image id.'
 echo "Image id is ${image_id}."
 
-# Tag for Upload to aws repo.
-echo "Re-tagging image for upload to remote repository."
-docker tag "${image_id}" "${remote_repo_tag}"
-errchk $? "Failed re-tagging image ${image_id}".
 
-# Upload.
-echo "Execute the following commands to upload the image to remote aws repository."
-echo '   $(aws ecr get-login --no-include-email --region eu-central-1)'
-echo "   docker push ${remote_repo_tag}"
+# ***** Test *****
+echo "***** Testing image *****"
+"${project_dir}/test/test_simple_run.sh" "${local_repo_path}/${repo_name}:${image_tag}"
+errchk $? "Test failed."
+
+# Tag for Upload to aws repo.
+if [ ! -z "$BAKERY_REMOTE_REPO_PATH" ] ; then
+    echo "Re-tagging image for upload to remote repository."
+    docker tag "${image_id}" "${remote_repo_path}/${repo_name}:${image_tag}"
+    errchk $? "Failed re-tagging image ${image_id}."
+else
+    echo "Environment variable BAKERY_REMOTE_REPO_PATH not set. Skipping retagging image." 
+fi
+
+# Upload image if necessary env vars are set.
+if [ ! -z "$BAKERY_REMOTE_REPO_PATH" ] && [ ! -z "$AWS_ACCESS_KEY_ID" ] && [ ! -z "$AWS_SECRET_ACCESS_KEY" ] && \
+       [ ! -z "$AWS_DEFAULT_REGION" ] ; then
+    echo "Logging in to aws account."
+    $(aws ecr get-login --no-include-email --region eu-central-1)
+    echo "Pushing ${remote_repo_path}/${repo_name}:${image_tag} to remote repository."
+    docker push "${remote_repo_path}/${repo_name}:${image_tag}"
+else
+    echo "Execute the following commands to upload the image to remote aws repository."
+    echo '   $(aws ecr get-login --no-include-email --region eu-central-1)'
+    echo "   docker push ${remote_repo_path}/${repo_name}:${image_tag}"
+fi

@@ -1,5 +1,5 @@
 ARG APP_VERSION
-FROM rkelm/minecraft_vanilla:APP_VERSION
+FROM rkelm/minecraft_vanilla:$APP_VERSION
 
 ENV APP_VERSION $APP_VERSION
 ENV APP_NAME Spigot Minecraft
