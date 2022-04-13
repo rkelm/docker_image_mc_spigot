@@ -16,6 +16,9 @@ remote_repo_path="$BAKERY_REMOTE_REPO_PATH"
 repo_name="minecraft_spigot"
 
 # Some options may be edited directly in the Dockerfile.master.
+java_16="/usr/lib/jvm/java-16-openjdk-amd64/bin/java"
+java_17="/usr/lib/jvm/java-17-openjdk-amd64/bin/java"
+
 
 # ***** Functions *****
 errchk() {
@@ -90,6 +93,15 @@ chmod ug+x "${rootfs}/opt/mc/bin/prepare_java_app.sh"
 cp unprepare_java_app.sh ${rootfs}/opt/mc/bin
 chmod ug+x "${rootfs}/opt/mc/bin/unprepare_java_app.sh"
 
+# Set java version for running BuildTools.jar.
+if ver_ge "${app_version}" "1.18" ; then
+    java="${java_17}"
+elif ver_ge "${app_version}" "1.12" ; then
+    java="${java_16}"
+else
+    errchk 1 "$1 ist an unssupported Mincecraft version."
+fi
+
 # Download BuildTools.
 if [ ! -e "${spigot_jar}" ] ; then
     curl -o "${build_tools_jar}" "https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar"
@@ -97,7 +109,7 @@ if [ ! -e "${spigot_jar}" ] ; then
     # Prepare git.
     git config --global --unset core.autocrlf
     # Compile spigot.
-    java -jar BuildTools.jar -rev "${app_version}"
+    "${java}" -jar BuildTools.jar -rev "${app_version}"
     errchk $? "Build of spigot jar file ${spigot_jar} failed."
     chmod +x "${spigot_jar}"
 else
