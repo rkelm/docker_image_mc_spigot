@@ -1,6 +1,6 @@
 #!/bin/bash
 echo Simple test run of docker image.
-echo Test is successful if image runs and outputs 'Preparing spawn area:' with in 5 minutes.
+echo Test is successful if image runs and outputs 'Preparing spawn area:' within 5 minutes.
 echo Script retuns non-zero value if not successful.
 
 
@@ -22,8 +22,14 @@ if [ -z "$project_dir" ] ; then
     errck 1 "Error: Could not determine project_dir."
 fi
 
+echo docker inspect "${container_name}" 2> /dev/null > /dev/null
+ret=$?
+if [ "$ret" == "0" ] ; then
+    echo Removing image "${container_name}" from previous run.
+    docker rm -f "${container_name}"
+fi
+    
 echo "Running test: SIMPLE RUN"
-
 # Test run, show container std output on screen.
 ( docker run --name "${container_name}" "${img_name}" "${img_run_cmd}" | tee "${project_dir}/${test_log_file}" & )
 
